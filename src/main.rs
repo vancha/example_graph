@@ -1,30 +1,36 @@
 use std::collections::{HashMap, HashSet, VecDeque};
 
+///A graph that uses an adjacency list to store vertices
 struct Graph<T> {
+    ///the adjacency list consists of a hashmap with a generic index pointing to a hashset of
+    ///adjacent generic values
     adjacency_list: HashMap<T, HashSet<T>>,
 }
+///the generic objects used by the graph must implement hash, display, eq and copy
 impl<T> Graph<T>
 where
     T: std::hash::Hash + Eq + std::fmt::Display + Copy,
 {
+    ///builder pattern: easily instantiate a new graph
     fn new() -> Self {
         Graph {
             adjacency_list: HashMap::new(),
         }
     }
-    fn add_edge(&mut self, from: T, to: T) {
-        if self.adjacency_list.contains_key(&from) {
-            self.adjacency_list.get_mut(&from).unwrap().insert(to);
+    ///add directed edge, goes one way
+    fn add_edge(&mut self, from_vertex: T, to_vertex: T) {
+        if self.adjacency_list.contains_key(&from_vertex) {
+            self.adjacency_list.get_mut(&from_vertex).unwrap().insert(to_vertex);
         } else {
-            self.adjacency_list.insert(from, HashSet::from([to]));
+            self.adjacency_list.insert(from_vertex, HashSet::from([to_vertex]));
         }
     }
-
-    fn get_neighbours(&self, element: T) -> Option<Vec<T>> {
-        if self.adjacency_list.contains_key(&element) {
+    ///get neighbours for any vertex
+    fn get_neighbours(&self, vertex: T) -> Option<Vec<T>> {
+        if self.adjacency_list.contains_key(&vertex) {
             Some(
                 self.adjacency_list
-                    .get(&element)
+                    .get(&vertex)
                     .unwrap()
                     .into_iter()
                     .map(|v| *v)
@@ -34,8 +40,9 @@ where
             None
         }
     }
-    fn print_depth_first(&self, starting_node: T) {
-        let mut stack: Vec<T> = Vec::from([starting_node]);
+    ///print vertices in graph in depth first order
+    fn print_depth_first(&self, starting_vertex: T) {
+        let mut stack: Vec<T> = Vec::from([starting_vertex]);
         while !stack.is_empty() {
             let current = stack.pop().unwrap();
             println!("{}", current);
@@ -46,8 +53,9 @@ where
             }
         }
     }
-    fn print_breadth_first(&self, starting_node: T) {
-        let mut queue: VecDeque<T> = VecDeque::from([starting_node]);
+    ///print vertices in graph in breadth first order
+    fn print_breadth_first(&self, starting_vertex: T) {
+        let mut queue: VecDeque<T> = VecDeque::from([starting_vertex]);
         while !queue.is_empty() {
             let current = queue.pop_front().unwrap();
             println!("{}", current);
@@ -58,6 +66,7 @@ where
             }
         }
     }
+    ///count all paths between two vertices in the graph
     fn count_paths_between(&self, starting_node: T, ending_node: T, current: T, visited: Vec<T>)-> i32 {
         let mut stack: Vec<T> = Vec::from([starting_node]);
         while !stack.is_empty() {
