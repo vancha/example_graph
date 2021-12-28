@@ -7,11 +7,15 @@ struct Graph<T> {
     adjacency_list: HashMap<T, HashSet<T>>,
 }
 trait IsSmallCity {
-    fn is_small_city(&self)->bool;
+    fn is_small_city(&self) -> bool;
 }
 impl<T: std::fmt::Display> IsSmallCity for T {
-    fn is_small_city(&self)->bool {
-        self.to_string().chars().filter(|c| c.is_ascii_uppercase()).count() == 0
+    fn is_small_city(&self) -> bool {
+        self.to_string()
+            .chars()
+            .filter(|c| c.is_ascii_uppercase())
+            .count()
+            == 0
     }
 }
 
@@ -107,11 +111,11 @@ where
         &self,
         u: T,
         d: T,
-        beingVisited: &mut HashMap<T, bool>,
+        visited: &mut HashMap<T, bool>,
         path: &mut Vec<T>,
         path_count: &mut i32,
     ) {
-        beingVisited.insert(u, true);
+        visited.insert(u, true);
         path.push(u);
         if u == d {
             *path_count += 1;
@@ -119,14 +123,14 @@ where
         } else {
             if let Some(neighbours) = self.get_neighbours(u) {
                 for i in neighbours {
-                    if !beingVisited.contains_key(&i) || !i.is_small_city() {
-                        self.count_paths_between(i, d, beingVisited, path,path_count);
+                    if !visited.contains_key(&i) || !i.is_small_city() {
+                        self.count_paths_between(i, d, visited, path, path_count);
                     }
                 }
             }
         }
         path.pop();
-        beingVisited.remove_entry(&u);
+        visited.remove_entry(&u);
     }
 
     ///count all paths between two vertices in the graph
@@ -134,11 +138,11 @@ where
         &self,
         u: T,
         d: T,
-        beingVisited: &mut HashMap<T, bool>,
+        visited: &mut HashMap<T, bool>,
         path: &mut Vec<T>,
         path_count: &mut i32,
     ) {
-        beingVisited.insert(u, true);
+        visited.insert(u, true);
         path.push(u);
         if u == d {
             *path_count += 1;
@@ -146,14 +150,14 @@ where
         } else {
             if let Some(neighbours) = self.get_neighbours(u) {
                 for i in neighbours {
-                    if !beingVisited.contains_key(&i)  || !i.is_small_city() {
-                        self.count_paths_between_caves(i, d, beingVisited, path,path_count);
+                    if !visited.contains_key(&i) || !i.is_small_city() {
+                        self.count_paths_between_caves(i, d, visited, path, path_count);
                     }
                 }
             }
         }
         path.pop();
-        beingVisited.remove_entry(&u);
+        visited.remove_entry(&u);
     }
 }
 
@@ -167,5 +171,14 @@ fn main() {
     g.add_undirected_edge("A", "end");
     g.add_undirected_edge("b", "end");
     let mut total_paths = 0;
-    g.count_paths_between_caves("start","end",&mut HashMap::new(), &mut vec![], &mut total_paths);
+    g.print_depth_first("start");//don't use on undirected thingies
+    //g.print_breadth_first("start");//don't use on undirected thingies
+    g.count_paths_between_caves(
+        "start",
+        "end",
+        &mut HashMap::new(),
+        &mut vec![],
+        &mut total_paths,
+    );
+    println!("there were a total of {} paths", total_paths);
 }
