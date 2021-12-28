@@ -6,16 +6,24 @@ struct Graph<T> {
     ///adjacent generic values
     adjacency_list: HashMap<T, HashSet<T>>,
 }
-trait IsSmallCity {
-    fn is_small_city(&self) -> bool;
+trait IsSmallCave {
+    fn is_small_cave(&self) -> bool;
 }
-impl<T: std::fmt::Display> IsSmallCity for T {
-    fn is_small_city(&self) -> bool {
+trait IsBigCave {
+    fn is_big_cave(&self)->bool;
+}
+impl<T: std::fmt::Display> IsSmallCave for T {
+    fn is_small_cave(&self) -> bool {
         self.to_string()
             .chars()
             .filter(|c| c.is_ascii_uppercase())
             .count()
             == 0
+    }
+}
+impl <T: IsSmallCave> IsBigCave for T {
+    fn is_big_cave(&self) -> bool {
+        !self.is_small_cave()
     }
 }
 
@@ -123,7 +131,7 @@ where
         } else {
             if let Some(neighbours) = self.get_neighbours(u) {
                 for i in neighbours {
-                    if !visited.contains_key(&i) || !i.is_small_city() {
+                    if !visited.contains_key(&i) || i.is_big_cave() {
                         self.count_paths_between(i, d, visited, path, path_count);
                     }
                 }
@@ -140,45 +148,62 @@ where
         d: T,
         visited: &mut HashMap<T, bool>,
         path: &mut Vec<T>,
-        path_count: &mut i32,
-    ) {
+        nr: &mut i32,
+    )->Vec<T> {
         visited.insert(u, true);
         path.push(u);
         if u == d {
-            *path_count += 1;
+            *nr += 1;
             println!("current path: {:?}", path);
         } else {
             if let Some(neighbours) = self.get_neighbours(u) {
                 for i in neighbours {
-                    if !visited.contains_key(&i) || !i.is_small_city() {
-                        self.count_paths_between_caves(i, d, visited, path, path_count);
+                    if !visited.contains_key(&i) || i.is_big_cave() {
+                        self.count_paths_between_caves(i, d, visited, path,nr);
                     }
                 }
             }
         }
         path.pop();
         visited.remove_entry(&u);
+        path.to_vec()
     }
 }
 
 fn main() {
     let mut g: Graph<&str> = Graph::new();
-    g.add_undirected_edge("start", "A");
-    g.add_undirected_edge("start", "b");
-    g.add_undirected_edge("A", "c");
-    g.add_undirected_edge("A", "b");
-    g.add_undirected_edge("b", "d");
-    g.add_undirected_edge("A", "end");
-    g.add_undirected_edge("b", "end");
-    let mut total_paths = 0;
-    g.print_depth_first("start");//don't use on undirected thingies
+    g.add_undirected_edge("ax","end");
+g.add_undirected_edge("xq","GF");
+g.add_undirected_edge("end","xq");
+g.add_undirected_edge("im","wg");
+g.add_undirected_edge("ax","ie");
+g.add_undirected_edge("start","ws");
+g.add_undirected_edge("ie","ws");
+g.add_undirected_edge("CV","start");
+g.add_undirected_edge("ng","wg");
+g.add_undirected_edge("ng","ie");
+g.add_undirected_edge("GF","ng");
+g.add_undirected_edge("ng","av");
+g.add_undirected_edge("CV","end");
+g.add_undirected_edge("ie","GF");
+g.add_undirected_edge("CV","ie");
+g.add_undirected_edge("im","xq");
+g.add_undirected_edge("start","GF");
+g.add_undirected_edge("GF","ws");
+g.add_undirected_edge("wg","LY");
+g.add_undirected_edge("CV","ws");
+g.add_undirected_edge("im","CV");
+g.add_undirected_edge("CV","wg");
+
+    //g.print_depth_first("start");//don't use on undirected thingies
     //g.print_breadth_first("start");//don't use on undirected thingies
+    let mut nr = 0;
     g.count_paths_between_caves(
         "start",
         "end",
         &mut HashMap::new(),
         &mut vec![],
-        &mut total_paths,
+        &mut nr,
     );
-    println!("there were a total of {} paths", total_paths);
+    println!("{} paths:", nr);
 }
