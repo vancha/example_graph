@@ -204,6 +204,40 @@ where
     }
 }
 
+/// This program finds all possible paths between two nodes in a graph
+/// for example, consider a graph like this:
+///    start
+///    /   \
+///c--A-----b--d
+///    \   /
+///     end
+///
+/// to count all possible paths between start and end in this little graph, you would first create
+/// the graph like so:
+///
+/// ```let mut g: Graph<&str> = Graph::new();```
+///
+/// Then, to add all those vertices to the graph (start, c a b d and end), you would do that like
+/// so:
+/// assuming the connections between the graph above are like the following
+/// start-A
+///start-b
+///A-c
+///A-b
+///b-d
+///A-end
+///b-end
+///the graph is created like so
+///```
+///     g.add_undirected_edge("start", "A");
+///     g.add_undirected_edge("start", "b");
+///     g.add_undirected_edge("A", "c");
+///     g.add_undirected_edge("A", "b");
+///     g.add_undirected_edge("b", "d");
+///     g.add_undirected_edge("A", "end");
+///     g.add_undirected_edge("b", "end");
+///```
+///
 fn main() {
     let mut g: Graph<&str> = Graph::new();
     g.add_undirected_edge("ax", "end");
